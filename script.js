@@ -6,13 +6,13 @@ const opmSongs = [
     'P7tMFlzJUMI', // IV Of Spades - Dulo Ng Hangganan
     'K0pUf2rREyU', // IV Of Spades - In My Prison
     '3f3V_Z0Q26I', // IV Of Spades - Hey Barbara
-    '7ixfBv67I8M', // Zild - Isang Anghel (Fixed ID)
+    '7ixfBv67I8M', // Zild - Isang Anghel
 
     // === MAKI (THE KING OF MODERN YEARNING) ===
     'KZwh-mJuXTg', // Maki - kahel na langit
     'n83pv5h2F4s', // Maki - Dilaw
     '_E2S0eKz09E', // Maki - Saan?
-    '87mshL9F2kw', // Maki - Namamasko (Fixed ID)
+    '87mshL9F2kw', // Maki - Namamasko
 
     // === CUP OF JOE & DIONELA ===
     'CcS1fsuT10M', // Cup of Joe - Multo
@@ -50,7 +50,10 @@ const opmSongs = [
 
 let player;
 let isPlayerReady = false;
-let currentTrackIndex = -1; // Keeps track of what is actively playing
+
+// Track history array to prevent immediate redundancy
+let playedHistory = []; 
+const MAX_HISTORY_SIZE = 10; 
 
 const statusText = document.getElementById('status-text');
 const songTitleText = document.getElementById('song-title');
@@ -99,7 +102,7 @@ window.onYouTubeIframeAPIReady = function() {
     });
 };
 
-// Logic to pick a random ID from the array and play it without back-to-back repeats
+// Logic to pick a random ID from the array while respecting the 10-song history rule
 function playRandomSong() {
     if (!isPlayerReady) {
         alert("YouTube is still loading or being blocked by your browser. Make sure your ad-blocker isn't interfering.");
@@ -108,13 +111,18 @@ function playRandomSong() {
     
     let randomIndex;
     
-    // Forces the code to keep picking a random index until it gets one that ISN'T playing right now
+    // Pick random index until it chooses one that is NOT inside our recent history array
     do {
         randomIndex = Math.floor(Math.random() * opmSongs.length);
-    } while (randomIndex === currentTrackIndex);
+    } while (playedHistory.includes(randomIndex));
     
-    // Update our tracker to the newly selected song
-    currentTrackIndex = randomIndex;
+    // Add the newly selected track to our history
+    playedHistory.push(randomIndex);
+    
+    // If our history grows past 10 entries, discard the oldest song index to free up the slot
+    if (playedHistory.length > MAX_HISTORY_SIZE) {
+        playedHistory.shift();
+    }
     
     player.loadVideoById({
         'videoId': opmSongs[randomIndex],
