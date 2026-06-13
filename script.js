@@ -53,7 +53,7 @@ let isPlayerReady = false;
 
 // Track history array to prevent immediate redundancy
 let playedHistory = []; 
-const MAX_HISTORY_SIZE = 10; 
+const MAX_HISTORY_SIZE = 15; // Keep track of the last 15 songs to ensure better variety
 
 const statusText = document.getElementById('status-text');
 const songTitleText = document.getElementById('song-title');
